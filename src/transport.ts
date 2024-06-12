@@ -65,7 +65,7 @@ export default class SentryTransport extends TransportStream {
 
     if (this.silent) return callback();
 
-    const { message, tags, user, ...meta } = info;
+    const { message, tags, user, transaction, ...meta } = info;
     const winstonLevel = info[LEVEL];
 
     const sentryLevel = this.levelsMap[winstonLevel];
@@ -75,9 +75,14 @@ export default class SentryTransport extends TransportStream {
     if (tags !== undefined && SentryTransport.isObject(tags)) {
       currentScope?.setTags(tags);
     }
+
     currentScope?.setExtras(meta);
     if (user !== undefined && SentryTransport.isObject(user)) {
       currentScope?.setUser(user);
+    }
+
+    if (transaction) {
+      currentScope?.setTransactionName(transaction);
     }
 
     // deprecated
